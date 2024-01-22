@@ -1,0 +1,14 @@
+@host = http://localhost:4000/v1
+
+POST {{host}}/movies
+Content-Type: application/json
+
+{
+    "title": "Deadpool",
+    "year": 2016,
+    "runtime": "108 mins",
+    "genres": [
+        "Action",
+        "Comedy"
+    ]
+}
