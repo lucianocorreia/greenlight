@@ -1,6 +1,8 @@
 package validator
 
-import "regexp"
+import (
+	"regexp"
+)
 
 var (
 	EmailRX = regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,16}$`)
@@ -30,18 +32,18 @@ func (v *Validator) AddError(key, message string) {
 // Check checks if the form field is empty and adds an error message to the errors map if it is.
 func (v *Validator) Check(ok bool, field, value string) {
 	if !ok {
-		v.AddError(field, "This field cannot be blank")
+		v.AddError(field, value)
 	}
 }
 
 // In checks if a string value is in a list of strings.
-func (v *Validator) In(field string, value string, list ...string) {
-	for _, item := range list {
-		if item == value {
-			return
+func In(value string, list ...string) bool {
+	for i := range list {
+		if value == list[i] {
+			return true
 		}
 	}
-	v.AddError(field, "This field is invalid")
+	return false
 }
 
 // Matches checks if a string value matches a regular expression.
