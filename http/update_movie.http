@@ -1,14 +1,8 @@
 @host = http://localhost:4000/v1
 
-PUT  {{host}}/movies/2
+PATCH  {{host}}/movies/2
 Content-Type: application/json
 
 {
-    "title": "Black Panther",
-    "year": 2018,
-    "runtime": "134 mins",
-    "genres": [
-        "Action",
-        "Adventure"
-    ]
+    "year": 2017
 }
