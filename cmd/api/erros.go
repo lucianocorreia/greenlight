@@ -3,7 +3,10 @@ package main
 import "net/http"
 
 func (app *application) logError(r *http.Request, err error) {
-	app.logger.Println(err)
+	app.logger.Error(err, map[string]string{
+		"request_method": r.Method,
+		"request_url":    r.URL.String(),
+	})
 }
 
 func (app *application) errorResponse(w http.ResponseWriter, r *http.Request, status int, message any) {
@@ -11,7 +14,6 @@ func (app *application) errorResponse(w http.ResponseWriter, r *http.Request, st
 
 	err := app.writeJSON(w, status, env, nil)
 	if err != nil {
-		app.logger.Println("Erro no write json")
 		app.logError(r, err)
 		w.WriteHeader(http.StatusInternalServerError)
 	}
