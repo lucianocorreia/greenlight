@@ -1,6 +1,6 @@
 @host = http://localhost:4000/v1
 
-PATCH  {{host}}/movies/2
+PATCH  {{host}}/movies/4
 Content-Type: application/json
 
 {

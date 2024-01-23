@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/lucianocorreia/greenlight/internal/validator"
@@ -62,7 +63,7 @@ func (m MovieModel) Get(id int64) (*Movie, error) {
 	}
 
 	query := `
-		SELECT pg_sleep(10), id, created_at, title, year, runtime, genres, version
+		SELECT id, created_at, title, year, runtime, genres, version
 		FROM movies
 		WHERE id = $1
 		`
@@ -72,7 +73,6 @@ func (m MovieModel) Get(id int64) (*Movie, error) {
 	defer cancel()
 
 	err := m.DB.QueryRowContext(ctx, query, id).Scan(
-		&[]byte{},
 		&movie.ID,
 		&movie.CreatedAt,
 		&movie.Title,
@@ -157,16 +157,20 @@ func (m MovieModel) Delete(id int64) error {
 }
 
 func (m MovieModel) GetAll(title string, genres []string, filters Filters) ([]*Movie, error) {
-	query := `
+	// Full text search query
+	// WHERE (to_tsvector('simple', title) @@ plainto_tsquery('simple', $1) OR $1 = '')
+	query := fmt.Sprintf(`
 		SELECT id, created_at, title, year, runtime, genres, version
 		FROM movies
-		ORDER BY id
-		`
+		WHERE (title ILIKE $1 OR $1 = '')		
+		AND (genres @> $2 OR $2 = '{}')
+		ORDER BY %s %s, id ASC
+		`, filters.sortColumn(), filters.sortDirection())
 
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	rows, err := m.DB.QueryContext(ctx, query)
+	rows, err := m.DB.QueryContext(ctx, query, title, pq.Array(genres))
 	if err != nil {
 		return nil, err
 	}
