@@ -47,10 +47,8 @@ func In(value string, list ...string) bool {
 }
 
 // Matches checks if a string value matches a regular expression.
-func (v *Validator) Matches(field string, value string, rx *regexp.Regexp) {
-	if !rx.MatchString(value) {
-		v.AddError(field, "This field is invalid")
-	}
+func Matches(value string, rx *regexp.Regexp) bool {
+	return rx.MatchString(value)
 }
 
 // Unique checks if a string value is contained in a slice of strings.
