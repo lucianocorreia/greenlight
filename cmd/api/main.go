@@ -4,12 +4,16 @@ import (
 	"context"
 	"database/sql"
 	"flag"
+	"log"
 	"os"
+	"strconv"
 	"time"
 
+	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 	"github.com/lucianocorreia/greenlight/internal/data"
 	"github.com/lucianocorreia/greenlight/internal/jsonlog"
+	"github.com/lucianocorreia/greenlight/internal/mailer"
 )
 
 const (
@@ -31,15 +35,29 @@ type config struct {
 		burst   int
 		enabled bool
 	}
+
+	smtp struct {
+		host     string
+		port     int
+		username string
+		password string
+		sender   string
+	}
 }
 
 type application struct {
 	config config
 	logger *jsonlog.Logger
 	models data.Models
+	mailer mailer.Mailer
 }
 
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
 	var cfg config
 
 	flag.IntVar(&cfg.port, "port", 4000, "API server port")
@@ -60,6 +78,23 @@ func main() {
 	flag.IntVar(&cfg.limiter.burst, "limiter-burst", 4, "Rate limiter maximum burst")
 	flag.BoolVar(&cfg.limiter.enabled, "limiter-enabled", true, "Enable rate limiter")
 
+	// smtp
+
+	mailerPort := os.Getenv("MAILER_PORT")
+	if mailerPort == "" {
+		mailerPort = "25"
+	}
+	p, error := strconv.Atoi(mailerPort)
+	if error != nil {
+		log.Fatal("Error converting mailer port to int")
+	}
+
+	flag.StringVar(&cfg.smtp.host, "smtp-host", os.Getenv("MAILER_HOST"), "SMTP server hostname")
+	flag.IntVar(&cfg.smtp.port, "smtp-port", p, "SMTP server port")
+	flag.StringVar(&cfg.smtp.username, "smtp-username", os.Getenv("MAILER_USERNAME"), "SMTP server username")
+	flag.StringVar(&cfg.smtp.password, "smtp-password", os.Getenv("MAILER_PASSWORD"), "SMTP server password")
+	flag.StringVar(&cfg.smtp.sender, "smtp-sender", "no-replay@greenlight.example", "SMTP sender email address")
+
 	flag.Parse()
 
 	logger := jsonlog.New(os.Stdout, jsonlog.LevelInfo)
@@ -76,6 +111,7 @@ func main() {
 		config: cfg,
 		logger: logger,
 		models: data.NewModels(db),
+		mailer: mailer.New(cfg.smtp.host, cfg.smtp.port, cfg.smtp.username, cfg.smtp.password, cfg.smtp.sender),
 	}
 
 	// srv := &http.Server{
