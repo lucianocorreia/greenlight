@@ -1,0 +1,8 @@
+@host = http://localhost:4000/v1
+
+PUT {{host}}/users/activated
+Content-Type: application/json
+
+{
+    "token": "HIVVLVPVS3E76SC5ALRUC2PFF4"
+}

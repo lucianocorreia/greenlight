@@ -4,7 +4,7 @@ POST {{host}}/users
 Content-Type: application/json
 
 {
-    "name": "John Doe2", 
-    "email": "john@doe2.com", 
+    "name": "Jonh Doe", 
+    "email": "jonh@doe.com", 
     "password": "12345678"
 }

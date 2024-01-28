@@ -5,7 +5,15 @@
 
     Thanks for signing up for greenlight! We're excited to have you on board!
 
-    For futures reference, your User ID number is {{.ID}}.
+    For futures reference, your User ID number is {{.userID}}.
+
+    Please send a request to 'PUT /v1/users/activated' with the following JSON body:
+
+    {
+        "token": {{.activationToken}}
+    }
+
+    Please note that this is a one-time token and will expire in 3 days.
 
     Thanks,
 
@@ -24,7 +32,17 @@
 
         <p>Thanks for signing up for a Greenlight account. We're excited to have you on board!</p>
 
-        <p>For future reference, your user ID number is {{.ID}}.</p>
+        <p>For future reference, your user ID number is {{.userID}}.</p>
+
+        <p>Please send a request to 'PUT /v1/users/activated' with the following JSON body:</p>
+
+        <pre><code>
+        {
+            "token": {{.activationToken}}
+        }
+        </code></pre>
+
+        <p>Please note that this is a one-time token and will expire in 3 days.</p>
 
         <p>Thanks,</p>
 
