@@ -1,3 +1,4 @@
 @host = http://localhost:4000/v1
 
 GET {{host}}/healthcheck
+Authorization: Bearer LNY3EW4LWAJS4ZWE3KFDXUVA5A

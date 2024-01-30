@@ -2,6 +2,7 @@
 
 POST {{host}}/movies
 Content-Type: application/json
+Authorization: Bearer LNY3EW4LWAJS4ZWE3KFDXUVA5A
 
 {
     "title": "Deadpool",
