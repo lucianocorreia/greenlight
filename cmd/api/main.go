@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"expvar"
 	"flag"
+	"fmt"
 	"log"
 	"os"
 	"runtime"
@@ -23,6 +24,8 @@ import (
 const (
 	version = "1.0.0"
 )
+
+var buildTime string
 
 type config struct {
 	port int
@@ -108,9 +111,17 @@ func main() {
 	flag.StringVar(&trustedOrigins, "cors-trusted-origins", "", "CORS trusted origins (space separated)")
 	cfg.cors.trustedOrigins = strings.Fields(trustedOrigins)
 
+	displayVersion := flag.Bool("version", false, "Display version and exit")
+
 	flag.Parse()
 
 	logger := jsonlog.New(os.Stdout, jsonlog.LevelInfo)
+
+	if *displayVersion {
+		fmt.Printf("Version:\t%s\n", version)
+		fmt.Printf("Build time:\t%s\n", buildTime)
+		os.Exit(0)
+	}
 
 	// Connect to the database
 	db, err := openDB(cfg)
